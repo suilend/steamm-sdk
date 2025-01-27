@@ -36,7 +36,7 @@ jobs:
           ACTIVE_ADDRESS=$(sui client addresses --json | jq -r '.activeAddress')
           echo "Active address: $ACTIVE_ADDRESS"
           echo "ACTIVE_ADDRESS=$ACTIVE_ADDRESS" >> $GITHUB_ENV
-          PRIVATE_KEY=$(sui keytool export --key-identity $ACTIVE_ADDRESS)
+          PRIVATE_KEY=$(sui keytool export --key-identity $ACTIVE_ADDRESS --json | jq -r '.exportedPrivateKey')
           echo "PRIVATE_KEY=$PRIVATE_KEY" >> $GITHUB_ENV
       
       - name: Setup localnet state
