@@ -25,6 +25,11 @@ jobs:
 
       - name: Install jq
         run: apt-get update && apt-get install -y jq
+      
+      - name: Install bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Sui localnet
         run: |
