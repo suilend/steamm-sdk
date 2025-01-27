@@ -63,5 +63,7 @@ jobs:
       
       - name: Setup localnet state
         run: |
+          cd temp/git
           ls
+          cd ../..
           bash ./bin/publocal.sh --no-clone
