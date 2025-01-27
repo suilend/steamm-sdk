@@ -100,8 +100,13 @@ populate_ts() {
 
     # Check if the package constant exists with empty value
     if grep -q "export const $PACKAGE_NAME = \"\";" "$TS_FILE"; then
-        # Replace empty value with actual package ID
-        sed -i "" "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS version
+            sed -i '' "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        else
+            # Linux version
+            sed -i "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        fi
     else
         echo "export const $PACKAGE_NAME = \"\";"
         echo "Error: Constant $PACKAGE_NAME not found in $TS_FILE or has unexpected format"
