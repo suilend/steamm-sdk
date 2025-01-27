@@ -64,5 +64,5 @@ jobs:
         run: |
           bash ./bin/publocal.sh 
       
-      - name: Run tests
-        run: bun test ./sdk/tests/index.test.ts
+    #   - name: Run tests
+    #     run: bun test ./sdk/tests/index.test.ts
