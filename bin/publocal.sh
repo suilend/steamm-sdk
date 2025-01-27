@@ -11,10 +11,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-
-# Cleanup
-./bin/unpublocal.sh
-
 # Check if current environment is localnet
 INITIAL_ENV=$(sui client envs --json | grep -oE '"[^"]*"' | tail -n1 | tr -d '"')
 
@@ -24,7 +20,10 @@ if [ "$INITIAL_ENV" != "localnet" ]; then
 fi
 
 if [ "$NO_CLONE" = false ]; then
-# Create suilend directory if it doesn't exist and cd into it
+    # Cleanup
+    ./bin/unpublocal.sh
+    
+    # Create suilend directory if it doesn't exist and cd into it
     mkdir -p temp &&
     git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
 fi
