@@ -1,15 +1,26 @@
 #!/bin/bash
 
 # Parse command line arguments
-NO_CLONE=false
+CI=false
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --no-clone) NO_CLONE=true ;;
+        --ci) CI=true ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
     shift
 done
+
+if [ "$CI" = false ]; then
+    # Cleanup
+    ./bin/unpublocal.sh
+
+    # Create suilend directory if it doesn't exist and cd into it
+    mkdir -p temp &&
+    git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
+else
+    ./bin/unpublocal.sh --ci
+fi
 
 # Check if current environment is localnet
 INITIAL_ENV=$(sui client envs --json | grep -oE '"[^"]*"' | tail -n1 | tr -d '"')
@@ -17,15 +28,6 @@ INITIAL_ENV=$(sui client envs --json | grep -oE '"[^"]*"' | tail -n1 | tr -d '"'
 if [ "$INITIAL_ENV" != "localnet" ]; then
     echo "Current environment is: $INITIAL_ENV. Switching to localnet..."
     sui client switch --env localnet
-fi
-
-if [ "$NO_CLONE" = false ]; then
-    # Cleanup
-    ./bin/unpublocal.sh
-
-    # Create suilend directory if it doesn't exist and cd into it
-    mkdir -p temp &&
-    git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
 fi
 
 
@@ -123,7 +125,6 @@ publish_package() {
     INITIAL_DIR=$(pwd)
     
     # Change to package directory
-    ls
     cd "$FOLDER_NAME"
     RESPONSE=$(sui client publish --silence-warnings --no-lint --json)
     cd "$INITIAL_DIR"
@@ -160,7 +161,6 @@ find_object_id() {
         return 1
     fi
 }
-
 
 LIQUID_STAKING_RESPONSE=$(publish_package "temp/liquid_staking" "LIQUID_STAKING_PKG_ID")
 WORMHOLE_RESPONSE=$(publish_package "temp/wormhole" "WORMHOLE_PKG_ID")
