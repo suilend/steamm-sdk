@@ -43,7 +43,7 @@ cp -r temp/git/contracts/steamm/sources/* temp/steamm/sources/
 
 cp -r templates/setup temp/steamm/sources/
 
-# # Copy Move.toml files from templates
+# Copy Move.toml files from templates
 cp templates/liquid_staking.toml temp/liquid_staking/Move.toml
 cp templates/pyth.toml temp/pyth/Move.toml
 cp templates/sprungsui.toml temp/sprungsui/Move.toml
@@ -123,6 +123,7 @@ publish_package() {
     INITIAL_DIR=$(pwd)
     
     # Change to package directory
+    ls
     cd "$FOLDER_NAME"
     RESPONSE=$(sui client publish --silence-warnings --no-lint --json)
     cd "$INITIAL_DIR"
