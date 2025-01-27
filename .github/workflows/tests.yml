@@ -46,12 +46,17 @@ jobs:
           echo "${{ secrets.STEAMM_REPO_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           chmod 700 ~/.ssh
-          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+          # Remove any existing known_hosts to start fresh
+          rm -f ~/.ssh/known_hosts
+          # Add GitHub's host key with strict checking disabled temporarily
+          ssh-keyscan -H github.com > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
-          git config --global core.sshCommand "ssh -o StrictHostKeyChecking=no"
-          # Debug: Test SSH connection (remove in production)
-          ssh -T git@github.com || true
+          
+          # Test the connection
+          ssh -o StrictHostKeyChecking=no git@github.com || true
       
     #   - name: Setup localnet state
     #     run: bash ./bin/publocal.sh
