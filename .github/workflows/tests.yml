@@ -59,6 +59,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no git@github.com || true
 
           git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
+          ls
       
       - name: Setup localnet state
-        run: bash ./bin/publocal.sh --no-clone
+        run: |
+          ls
+          bash ./bin/publocal.sh --no-clone
