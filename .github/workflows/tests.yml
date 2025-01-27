@@ -26,19 +26,19 @@ jobs:
       - name: Install jq
         run: apt-get update && apt-get install -y jq
 
-      - name: Sui localnet
-        run: |
-          sui genesis -f
-          sui start &
+    #   - name: Sui localnet
+    #     run: |
+    #       sui genesis -f
+    #       sui start &
 
-      - name: Get active address
-        run: |
-          sleep 1
-          ACTIVE_ADDRESS=$(sui client addresses --json | jq -r '.activeAddress')
-          echo "Active address: $ACTIVE_ADDRESS"
-          echo "ACTIVE_ADDRESS=$ACTIVE_ADDRESS" >> $GITHUB_ENV
-          PRIVATE_KEY=$(sui keytool export --key-identity $ACTIVE_ADDRESS --json | jq -r '.exportedPrivateKey')
-          echo "PRIVATE_KEY=$PRIVATE_KEY" >> $GITHUB_ENV
+    #   - name: Get active address
+    #     run: |
+    #       sleep 1
+    #       ACTIVE_ADDRESS=$(sui client addresses --json | jq -r '.activeAddress')
+    #       echo "Active address: $ACTIVE_ADDRESS"
+    #       echo "ACTIVE_ADDRESS=$ACTIVE_ADDRESS" >> $GITHUB_ENV
+    #       PRIVATE_KEY=$(sui keytool export --key-identity $ACTIVE_ADDRESS --json | jq -r '.exportedPrivateKey')
+    #       echo "PRIVATE_KEY=$PRIVATE_KEY" >> $GITHUB_ENV
 
       - name: Fetch steamm repo
         run: |
@@ -63,7 +63,7 @@ jobs:
       
       - name: Setup localnet state
         run: |
-          cd temp/git
+          cd temp/git/contracts
           ls
-          cd ../..
+          cd ../../..
           bash ./bin/publocal.sh --no-clone
