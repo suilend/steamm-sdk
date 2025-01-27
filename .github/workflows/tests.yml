@@ -33,6 +33,7 @@ jobs:
 
       - name: Get active address
         run: |
+          sleep 1
           ACTIVE_ADDRESS=$(sui client addresses --json | jq -r '.activeAddress')
           echo "Active address: $ACTIVE_ADDRESS"
           echo "ACTIVE_ADDRESS=$ACTIVE_ADDRESS" >> $GITHUB_ENV
