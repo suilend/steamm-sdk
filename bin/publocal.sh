@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Parse command line arguments
+NO_CLONE=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --no-clone) NO_CLONE=true ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+
 # Cleanup
 ./bin/unpublocal.sh
 
@@ -11,14 +23,15 @@ if [ "$INITIAL_ENV" != "localnet" ]; then
     sui client switch --env localnet
 fi
 
+if [ "$NO_CLONE" = false ]; then
 # Create suilend directory if it doesn't exist and cd into it
-mkdir -p temp &&
+    mkdir -p temp &&
+    git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
+fi
+
 
 # Create source directories
 mkdir -p temp/liquid_staking/sources temp/pyth/sources temp/sprungsui/sources temp/suilend/sources temp/wormhole/sources temp/steamm/sources
-
-git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
-
 sui move build --path temp/git/contracts/steamm
 
 # Copy dependencies from build to local directories

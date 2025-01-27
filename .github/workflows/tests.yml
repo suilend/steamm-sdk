@@ -40,7 +40,7 @@ jobs:
           PRIVATE_KEY=$(sui keytool export --key-identity $ACTIVE_ADDRESS --json | jq -r '.exportedPrivateKey')
           echo "PRIVATE_KEY=$PRIVATE_KEY" >> $GITHUB_ENV
 
-      - name: Setup ssh connection to steamm repo
+      - name: Fetch steamm repo
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.STEAMM_REPO_SSH_KEY }}" > ~/.ssh/id_rsa
@@ -60,5 +60,5 @@ jobs:
 
           git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
       
-    #   - name: Setup localnet state
-    #     run: bash ./bin/publocal.sh
+      - name: Setup localnet state
+        run: bash ./bin/publocal.sh --no-clone
