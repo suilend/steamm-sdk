@@ -16,7 +16,7 @@
     "prettier": "prettier --write \"./sdk/src/**/*\"",
     "lint": "bun eslint && bun prettier",
     "release": "bun run build && bun ts-node ./prepublish.ts && cd ./dist && npm publish --access public",
-    "test": "bun test"
+    "test": "bun test ./sdk/tests/index.test.ts"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,12 @@
   "bugs": {
     "url": "https://github.com/suilend/steamm-fe/issues"
   },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/temp/"
+    ]
+  },
   "dependencies": {
     "@mysten/sui": "^1.9.0",
     "bn.js": "^5.2.1",
@@ -32,7 +38,7 @@
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.6",
-    "@types/bun": "^1.1.17",
+    "@types/bun": "^1.2.0",
     "@types/chai": "^4.3.19",
     "@types/jest": "^29.5.14",
     "babel-jest": "^29.7.0",
