@@ -1,7 +1,26 @@
 #!/bin/bash
 
-# Cleanup
-./bin/unpublocal.sh
+# Parse command line arguments
+CI=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --ci) CI=true ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+if [ "$CI" = false ]; then
+    # Cleanup
+    ./bin/unpublocal.sh
+
+    # Create suilend directory if it doesn't exist and cd into it
+    mkdir -p temp &&
+    git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
+else
+    ./bin/unpublocal.sh --ci
+fi
 
 # Check if current environment is localnet
 INITIAL_ENV=$(sui client envs --json | grep -oE '"[^"]*"' | tail -n1 | tr -d '"')
@@ -11,14 +30,9 @@ if [ "$INITIAL_ENV" != "localnet" ]; then
     sui client switch --env localnet
 fi
 
-# Create suilend directory if it doesn't exist and cd into it
-mkdir -p temp &&
 
 # Create source directories
 mkdir -p temp/liquid_staking/sources temp/pyth/sources temp/sprungsui/sources temp/suilend/sources temp/wormhole/sources temp/steamm/sources
-
-git clone --branch init-sdk git@github.com:solendprotocol/steamm.git temp/git
-
 sui move build --path temp/git/contracts/steamm
 
 # Copy dependencies from build to local directories
@@ -31,7 +45,7 @@ cp -r temp/git/contracts/steamm/sources/* temp/steamm/sources/
 
 cp -r templates/setup temp/steamm/sources/
 
-# # Copy Move.toml files from templates
+# Copy Move.toml files from templates
 cp templates/liquid_staking.toml temp/liquid_staking/Move.toml
 cp templates/pyth.toml temp/pyth/Move.toml
 cp templates/sprungsui.toml temp/sprungsui/Move.toml
@@ -86,8 +100,13 @@ populate_ts() {
 
     # Check if the package constant exists with empty value
     if grep -q "export const $PACKAGE_NAME = \"\";" "$TS_FILE"; then
-        # Replace empty value with actual package ID
-        sed -i "" "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS version
+            sed -i '' "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        else
+            # Linux version
+            sed -i "s/export const $PACKAGE_NAME = \"\"/export const $PACKAGE_NAME = \"$PACKAGE_ID\"/;" "$TS_FILE"
+        fi
     else
         echo "export const $PACKAGE_NAME = \"\";"
         echo "Error: Constant $PACKAGE_NAME not found in $TS_FILE or has unexpected format"
@@ -148,7 +167,6 @@ find_object_id() {
     fi
 }
 
-
 LIQUID_STAKING_RESPONSE=$(publish_package "temp/liquid_staking" "LIQUID_STAKING_PKG_ID")
 WORMHOLE_RESPONSE=$(publish_package "temp/wormhole" "WORMHOLE_PKG_ID")
 SPRUNGSUI_RESPONSE=$(publish_package "temp/sprungsui" "SPRUNGSUI_PKG_ID") 
@@ -192,4 +210,4 @@ if [ "$INITIAL_ENV" != "localnet" ]; then
     sui client switch --env "$INITIAL_ENV"
 fi
 
-sui client call --package "$PACKAGE_ID" --module setup --function setup --args "$lending_market_registry" "$registry" "$lp_metadata" "$lp_treasury_cap" "$usdc_metadata" "$sui_metadata" "$b_usdc_metadata" "$b_sui_metadata" "$b_usdc_treasury_cap" "$b_sui_treasury_cap"
+sui client call --package "$PACKAGE_ID" --module setup --function setup --args "$lending_market_registry" "$registry" "$lp_metadata" "$lp_treasury_cap" "$usdc_metadata" "$sui_metadata" "$b_usdc_metadata" "$b_sui_metadata" "$b_usdc_treasury_cap" "$b_sui_treasury_cap" > /dev/null
