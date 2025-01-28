@@ -2,12 +2,10 @@ name: SDK Tests
 
 on:
   pull_request:
-  push:
-    branches: [main, develop, add_ci]
+    branches: [main, develop]
 
 jobs:
   move-test:
-    if: (github.event_name == 'push' && contains(github.ref, 'refs/heads/')) || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     container: 
       image: mysten/sui-tools:mainnet 
